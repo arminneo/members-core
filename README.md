@@ -1,7 +1,10 @@
 # CodingChallenge Developer:
 
 Create your own branch and commit to that branch only.    
-When you completed the assignment, please make a pull request, so we get a notifaction that you are done.
+When you completed the assignment, please make a pull request, so we get a notifaction that you are done.     
+Submit your best work, where you follow all the best practices of software development.    
+Imagine this is not a test but it's your daily work.
+
 
 # Epic/Story
 As a technical lead I want to have a "Member" service so that I can easily:
