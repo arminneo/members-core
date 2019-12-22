@@ -2,10 +2,10 @@ package com.armin.rights.memberscore.controllers;
 
 import com.armin.rights.memberscore.models.Member;
 import com.armin.rights.memberscore.models.MemberModels;
+import com.armin.rights.memberscore.services.FileStorageService;
 import com.armin.rights.memberscore.services.MemberService;
 import com.armin.rights.memberscore.stores.MemberStore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,16 +20,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import java.util.Date;
-import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static com.armin.rights.memberscore.controllers.MembersController.MEMBER_PREFIX;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -37,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class MembersControllerTest {
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final String PREFIX = "/api/v1/members";
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,16 +43,19 @@ class MembersControllerTest {
 
     MemberService service;
 
+    @Autowired
+    FileStorageService fileStorageService;
+
     @BeforeEach
     void setUp() {
         Member m = new Member("FirstMember", "Last", new Date(), "12345");
         store.save(m);
-        service = new MemberService(store);
+        service = new MemberService(store, fileStorageService);
     }
 
     @Test
     void all() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get(PREFIX + "/")
+        MvcResult mvcResult = mockMvc.perform(get(MEMBER_PREFIX + "/")
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -73,7 +72,7 @@ class MembersControllerTest {
         MemberModels.Input input = new MemberModels.Input("testuser", "testlast", new Date(), "12345");
         String jsonBody = mapper.writeValueAsString(input);
 
-        MvcResult mvcResult = mockMvc.perform(post(PREFIX + "/")
+        MvcResult mvcResult = mockMvc.perform(post(MEMBER_PREFIX + "/")
                 .content(jsonBody)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
@@ -93,7 +92,7 @@ class MembersControllerTest {
         Member member = new Member("FirstMember", "Last", new Date(), "12345");
         store.save(member);
 
-        MvcResult mvcResult = mockMvc.perform(get(PREFIX + "/" + member.getId().toString())
+        MvcResult mvcResult = mockMvc.perform(get(MEMBER_PREFIX + "/" + member.getId().toString())
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -110,7 +109,7 @@ class MembersControllerTest {
         MemberModels.Input input = new MemberModels.Input("testuser", "testlast", new Date(), "ased");
         String jsonBody = mapper.writeValueAsString(input);
 
-        mockMvc.perform(post(PREFIX + "/")
+        mockMvc.perform(post(MEMBER_PREFIX + "/")
                 .content(jsonBody)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
@@ -119,7 +118,7 @@ class MembersControllerTest {
                 .andReturn();
 
         jsonBody  = "{\"wrong\":\"json\"}";
-        mockMvc.perform(post(PREFIX + "/")
+        mockMvc.perform(post(MEMBER_PREFIX + "/")
                 .content(jsonBody)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
@@ -129,25 +128,46 @@ class MembersControllerTest {
     }
 
     @Test
-    void updateMember() {
+    void updateMember() throws Exception {
         Member member = new Member("FirstMember", "Last", new Date(), "12345");
-        store.save(member);
+        member = store.save(member);
+        MemberModels.Input input = new MemberModels.Input("updated", "user", new Date(), "98765");
+        String jsonBody = mapper.writeValueAsString(input);
+
+        MvcResult mvcResult = mockMvc.perform(put(MEMBER_PREFIX + "/" + member.getId().toString())
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        jsonBody = mvcResult.getResponse().getContentAsString();
+        MemberModels.Output result = mapper.readValue(jsonBody, MemberModels.Output.class);
+        Assert.assertEquals(result.getFirstName(), input.getFirstName());
+        Assert.assertEquals(result.getZipcode(), input.getZipcode());
     }
 
     @Test
-    void deleteMember() {
+    void deleteMember() throws Exception {
         Member member = new Member("FirstMember", "Last", new Date(), "12345");
-        store.save(member);
+        member = store.save(member);
+
+        mockMvc.perform(delete(MEMBER_PREFIX + "/" + member.getId().toString())
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andReturn();
     }
 
     @Test
     void xml() throws Exception {
-        XmlMapper xmlMapper = new XmlMapper();
+        com.fasterxml.jackson.dataformat.xml.XmlMapper xmlMapper = new com.fasterxml.jackson.dataformat.xml.XmlMapper();
 
         MemberModels.Input input = new MemberModels.Input("testuser", "testlast", new Date(), "12345");
         String xmlBody = xmlMapper.writeValueAsString(input);
 
-        MvcResult mvcResult = mockMvc.perform(post(PREFIX + "/")
+        MvcResult mvcResult = mockMvc.perform(post(MEMBER_PREFIX + "/")
                 .content(xmlBody)
                 .contentType(MediaType.APPLICATION_XML)
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML))

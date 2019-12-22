@@ -14,8 +14,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
@@ -25,12 +23,15 @@ class MemberServiceTest {
 
     MemberService service;
 
+    @Autowired
+    FileStorageService fileStorageService;
+
     @BeforeEach
     void setUp() {
         Member m = new Member("FirstMember", "Last", new Date(), "12345");
         store.save(m);
 
-        service = new MemberService(store);
+        service = new MemberService(store, fileStorageService);
     }
 
     @Test

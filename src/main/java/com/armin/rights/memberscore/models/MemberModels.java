@@ -14,6 +14,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
 
+import static com.armin.rights.memberscore.controllers.MembersController.getFullPictureUrl;
+
 
 public interface MemberModels {
     @Data
@@ -96,6 +98,8 @@ public interface MemberModels {
         private String zipcode;
         private String picture;
 
+        private String pictureUrl;
+
         public Long getId() {
             return id;
         }
@@ -152,6 +156,14 @@ public interface MemberModels {
             this.picture = picture;
         }
 
+        public String getPictureUrl() {
+            return pictureUrl;
+        }
+
+        public void setPictureUrl(String pictureUrl) {
+            this.pictureUrl = pictureUrl;
+        }
+
         public static Output box(Member from) {
             Output o = new Output();
             o.setId(from.getId());
@@ -160,7 +172,7 @@ public interface MemberModels {
             o.setBirthday(from.getBirthday());
             o.setZipcode(from.getZipcode());
             o.setPicture(from.getPicture());
-
+            o.setPictureUrl(getFullPictureUrl(from.getPicture()));
             return o;
         }
     }

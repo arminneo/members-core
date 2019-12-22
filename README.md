@@ -1,3 +1,8 @@
+# How to run
+
+You can see the swagger API documentation here:
+http://localhost:8080/swagger-ui.html#/
+
 # CodingChallenge Developer:
 
 Create your own branch and commit to that branch only.    

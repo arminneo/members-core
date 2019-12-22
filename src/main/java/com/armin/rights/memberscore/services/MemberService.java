@@ -5,17 +5,20 @@ import com.armin.rights.memberscore.models.Member;
 import com.armin.rights.memberscore.models.MemberModels;
 import com.armin.rights.memberscore.stores.MemberStore;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class MemberService {
     private final MemberStore store;
+    private final FileStorageService fileStorageService;
 
-    public MemberService(MemberStore store) {
+    public MemberService(MemberStore store, FileStorageService fileStorageService) {
         this.store = store;
+        this.fileStorageService = fileStorageService;
     }
 
     public List<MemberModels.Output> all() {
@@ -42,12 +45,34 @@ public class MemberService {
                     m.setLastName(member.getLastName());
                     m.setBirthday(member.getBirthday());
                     m.setZipcode(member.getZipcode());
-                    return MemberModels.Output.box(store.save(member));
+                    return MemberModels.Output.box(store.save(m));
                 })
                 .orElseThrow(() -> new MemberNotFoundException(id));
     }
 
     public void delete(Long id) {
-        store.deleteById(id);
+        Member member = store.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException(id));
+
+        if (!StringUtils.isEmpty(member.getPicture())) {
+            try {
+                fileStorageService.deleteFile(member.getPicture());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        store.deleteById(member.getId());
     }
+
+    public void updatePicture(Long id, String pictureFile) throws MemberNotFoundException {
+
+        store.findById(id)
+                .map(m -> {
+                    m.setPicture(pictureFile);
+                    return MemberModels.Output.box(store.save(m));
+                })
+                .orElseThrow(() -> new MemberNotFoundException(id));
+    }
+
+
 }
