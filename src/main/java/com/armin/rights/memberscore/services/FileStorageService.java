@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
 
 @Service
 public class FileStorageService {
@@ -44,6 +45,7 @@ public class FileStorageService {
                 throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
             }
 
+            fileName = Instant.now().getEpochSecond() + findExtension(fileName);
             // Copy file to the target location (Replacing existing file with the same name)
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
@@ -75,5 +77,13 @@ public class FileStorageService {
 
     public String getUploadDir() {
         return fileStorageProperties.getUploadDir();
+    }
+
+    public static String findExtension(String fileName) {
+        int lastIndex = fileName.lastIndexOf('.');
+        if (lastIndex == -1) {
+            return "";
+        }
+        return fileName.substring(lastIndex);
     }
 }

@@ -1,4 +1,6 @@
 # How to run
+Please take it to consideration that it take a lot of time to make this application. And If I wanted to make it perfect it would require much more time.
+
 [1] Install latest [JRE 11](https://www.oracle.com/technetwork/java/javase/downloads/index.html) or higher or Make sure you have [OpenJDK](https://openjdk.java.net/install/)
 
 [2] Ensure you have version 11 or higher
@@ -29,6 +31,8 @@ mvn test
 - API runs on 8080 Port make sure the port is available.
 - All API are on `http://localhost:8080/api/v1/members/`
 - Make sure application have read/write permission for `uploadDir` you can get the directory's location using `health check` API 
+- FirstName and LastName are mandatory. Zipcode is consist of 5 digits.
+
 
 ## List of APIs
 
