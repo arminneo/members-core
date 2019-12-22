@@ -20,6 +20,10 @@ mvn spring-boot:run
 
 - You can see the swagger API documentation here:
 http://localhost:8080/swagger-ui.html#/
+- You can run tests with following script:
+```shell script
+mvn test
+```
 
 ## Notes
 - API runs on 8080 Port make sure the port is available.
