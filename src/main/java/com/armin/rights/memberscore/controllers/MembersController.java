@@ -17,7 +17,6 @@ import java.util.List;
 @RequestMapping(value = "/api/v1/members", produces = {
         MediaType.APPLICATION_XML_VALUE,
         MediaType.APPLICATION_JSON_VALUE})
-@Validated
 public class MembersController {
     private final MemberService service;
 
@@ -31,7 +30,7 @@ public class MembersController {
     }
 
     @PostMapping
-    MemberModels.Output newMember(@RequestBody MemberModels.Input newMember) {
+    MemberModels.Output newMember(@RequestBody @Validated MemberModels.Input newMember) {
         return service.add(newMember);
     }
 
@@ -42,7 +41,7 @@ public class MembersController {
     }
 
     @PutMapping("/{id}")
-    MemberModels.Output updateMember(@RequestBody MemberModels.Input newMember, @PathVariable Long id) throws MemberNotFoundException {
+    MemberModels.Output updateMember(@RequestBody @Validated MemberModels.Input newMember, @PathVariable Long id) throws MemberNotFoundException {
         return service.update(id, newMember);
     }
 

@@ -5,6 +5,7 @@ import com.armin.rights.memberscore.models.MemberModels;
 import com.armin.rights.memberscore.services.MemberService;
 import com.armin.rights.memberscore.stores.MemberStore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -105,13 +106,61 @@ class MembersControllerTest {
     }
 
     @Test
+    void validation() throws Exception {
+        MemberModels.Input input = new MemberModels.Input("testuser", "testlast", new Date(), "ased");
+        String jsonBody = mapper.writeValueAsString(input);
+
+        mockMvc.perform(post(PREFIX + "/")
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        jsonBody  = "{\"wrong\":\"json\"}";
+        mockMvc.perform(post(PREFIX + "/")
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test
     void updateMember() {
         Member member = new Member("FirstMember", "Last", new Date(), "12345");
         store.save(member);
-        
     }
 
     @Test
     void deleteMember() {
+        Member member = new Member("FirstMember", "Last", new Date(), "12345");
+        store.save(member);
     }
+
+    @Test
+    void xml() throws Exception {
+        XmlMapper xmlMapper = new XmlMapper();
+
+        MemberModels.Input input = new MemberModels.Input("testuser", "testlast", new Date(), "12345");
+        String xmlBody = xmlMapper.writeValueAsString(input);
+
+        MvcResult mvcResult = mockMvc.perform(post(PREFIX + "/")
+                .content(xmlBody)
+                .contentType(MediaType.APPLICATION_XML)
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        xmlBody = mvcResult.getResponse().getContentAsString();
+        MemberModels.Output result = xmlMapper.readValue(xmlBody, MemberModels.Output.class);
+        Assert.assertNotNull(result.getId());
+        Assert.assertEquals(result.getFirstName(), input.getFirstName());
+        Assert.assertEquals(result.getZipcode(), input.getZipcode());
+
+    }
+
 }

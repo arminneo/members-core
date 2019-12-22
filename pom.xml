@@ -53,6 +53,7 @@
 			</exclusions>
 		</dependency>
 
+		<!-- Swagger -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
@@ -78,6 +79,17 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
+
+		<!-- XML -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.woodstox</groupId>
+			<artifactId>woodstox-core-asl</artifactId>
+		</dependency>
     </dependencies>
 
 	<build>

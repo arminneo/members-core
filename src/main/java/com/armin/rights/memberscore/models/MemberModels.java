@@ -8,11 +8,20 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.util.Date;
+
 
 public interface MemberModels {
     @Data
-    class Input {
+    @XmlRootElement(name = "Members")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    class Input implements Serializable {
+        private static final long serialVersionUID = 2L;
+
         public Input() {
         }
 
@@ -76,7 +85,10 @@ public interface MemberModels {
     }
 
     @Data
+    @XmlRootElement(name = "Members")
+    @XmlAccessorType(XmlAccessType.FIELD)
     class Output {
+        private static final long serialVersionUID = 3L;
         private Long id;
         private String firstName;
         private String lastName;
