@@ -11,14 +11,14 @@ java --version
 ```` shell script
 mvn -v
 ```` 
-[5] Make sure you are application's directory.
+[5] Make sure you are in the application's directory.
 
 [6] Run the application using following command:
 ```` shell script
 mvn spring-boot:run
 ```` 
 
-- You can see the swagger API documentation here:
+- You can see API documentation (using swagger) here:
 http://localhost:8080/swagger-ui.html#/
 - You can run tests with following script:
 ```shell script
@@ -28,7 +28,7 @@ mvn test
 ## Notes
 - API runs on 8080 Port make sure the port is available.
 - All API are on `http://localhost:8080/api/v1/members/`
-- Make sure application have permission for `uploadDir` you can get the directory's location using `health check` API 
+- Make sure application have read/write permission for `uploadDir` you can get the directory's location using `health check` API 
 
 ## List of APIs
 
