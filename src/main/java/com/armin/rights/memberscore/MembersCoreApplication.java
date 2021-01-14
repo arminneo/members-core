@@ -7,12 +7,14 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 @SpringBootApplication
 @EnableConfigurationProperties({
-		FileStorageProperties.class
+        FileStorageProperties.class
 })
 public class MembersCoreApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(MembersCoreApplication.class, args);
-	}
+    public static void main(String[] args) {
+        FirstChildClass fcc = new FirstChildClass();
+        Boolean something = fcc.doSomething();
+        SpringApplication.run(MembersCoreApplication.class, args);
+    }
 
 }
