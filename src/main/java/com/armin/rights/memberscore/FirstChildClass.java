@@ -18,5 +18,12 @@ public class FirstChildClass extends ParentClass {
                 break;
         }
 
+        switch (day) {
+            case SUNDAY:
+            case FRIDAY:
+                TUESDAY:
+                doSomething();
+                break;
+        }
     }
 }
